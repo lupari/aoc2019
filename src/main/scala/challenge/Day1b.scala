@@ -10,9 +10,9 @@ object Day1b extends Challenge {
   def fuelSum(a: Int): Int = {
 
     @tailrec
-    def acc(remaining: Int, sum: Int): Int = remaining match {
-      case r if r > 0 =>
-        val amount = Math.max(0, r / 3 - 2)
+    def acc(xs: Int, sum: Int): Int = xs match {
+      case x if x > 0 =>
+        val amount = Math.max(0, x / 3 - 2)
         acc(amount, sum + amount)
       case _ => sum
     }

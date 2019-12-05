@@ -10,13 +10,12 @@ object Day2 extends Challenge {
   def execute(program: List[Int]): List[Int] = {
 
     @tailrec
-    def acc(p: Int, xs: List[Int]): List[Int] = p match {
-      case x if x > xs.length - 1 => xs
-      case _ if xs(p) == 99       => xs
-      case _ =>
+    def acc(p: Int, xs: List[Int]): List[Int] = xs(p) match {
+      case 99 => xs
+      case instr =>
         val (a, b) = (xs(xs(p + 1)), xs(xs(p + 2)))
-        val value  = if (xs(p) == 1) a + b else a * b
-        acc(p + 4, xs.patch(xs(p + 3), Seq(value), 1))
+        val value  = if (instr == 1) a + b else a * b
+        acc(p + 4, xs.updated(xs(p + 3), value))
     }
 
     acc(0, program)

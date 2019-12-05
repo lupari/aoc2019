@@ -10,8 +10,8 @@ object Day4 extends Challenge {
       val pwd = i.toString.map(_.asDigit)
       pwd.zipWithIndex.sliding(2).find(p => p.head._1 > p.last._1) match {
         case Some(p) =>
-          val next: Int = pwd.patch(p.last._2, Seq(pwd(p.last._2) + 1), 1).mkString.toInt
-          (false, next)
+          val next = pwd.take(p.head._2) ++ List.fill(pwd.length - p.head._2)(pwd(p.head._2))
+          (false, next.mkString.toInt)
         case _ => (true, i + 1)
       }
     }
@@ -23,8 +23,8 @@ object Day4 extends Challenge {
       case x if x >= end      => pwds
       case x if !hasDouble(x) => acc(pwd + 1, pwds)
       case _ =>
-        val result = checkOrder(pwd)
-        acc(result._2, if (result._1) pwds :+ pwd else pwds)
+        val (ok, next) = checkOrder(pwd)
+        acc(next, if (ok) pwds :+ pwd else pwds)
     }
 
     acc(start, List())
