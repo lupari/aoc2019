@@ -24,7 +24,7 @@ object Day3b extends Challenge {
       case _ => coords
     }
 
-    Seq((0, 0)) ++ acc((0, 0), wire, Seq())
+    Seq((0, 0)) ++ acc((0, 0), wire, Nil)
   }
 
   override def run(): Any = {
