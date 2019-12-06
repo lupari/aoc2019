@@ -28,7 +28,7 @@ object Day3 extends Challenge {
   }
 
   override def run(): Any = {
-    val input          = Source.fromResource("day3.txt").getLines.map(s => s.split(",").toList).toList
+    val input          = Source.fromResource("day3.txt").getLines.map(_.split(",").toList).toList
     val (wire1, wire2) = (input.head, input.last)
     route(wire1).intersect(route(wire2)).map(i => Math.abs(i._1) + Math.abs(i._2)).min
   }
