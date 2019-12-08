@@ -22,10 +22,11 @@ object Day7b extends Challenge {
     @tailrec
     def acc(p: Int, xs: List[Int], in: List[Int], out: Int): Output = xs(p) match {
       case 99 => Output(out, KILL, xs)
-      case 3 => in match {
-        case h :: t => acc(p + 2, xs.updated(xs(p + 1), h), t, out)
-        case _ => Output(out, p, xs) // halt as no input available
-      }
+      case 3 =>
+        in match {
+          case h :: t => acc(p + 2, xs.updated(xs(p + 1), h), t, out)
+          case _      => Output(out, p, xs) // halt as no input available
+        }
       case instr =>
         val (opcode, m1, m2, _) = parse(instr)
         val v1                  = value(xs, p + 1, m1)
@@ -61,9 +62,9 @@ object Day7b extends Challenge {
     def acc(xs: List[Amp], i: Int, signals: List[Int]): Int = amplify(xs(i)) match {
       case Output(_, KILL, _) => signals.last
       case Output(sig, p, state) =>
-        val next = (i + 1) % xs.length
+        val next    = (i + 1) % xs.length
         val nextAmp = xs(next).copy(in = xs(next).in :+ sig)
-        val amps = xs.updated(i, Amp(Nil, state, p)).updated(next, nextAmp)
+        val amps    = xs.updated(i, Amp(Nil, state, p)).updated(next, nextAmp)
         acc(amps, next, signals :+ sig)
     }
 
@@ -72,9 +73,12 @@ object Day7b extends Challenge {
 
   override def run(): Any = {
     val program = Source.fromResource("day7.txt").mkString.split(",").map(_.trim.toInt).toList
-    (5 to 9).toList.permutations.zipWithIndex.map(
-      p => p._1.map(i => Amp(if (p._2 == 0) List(i, 0) else List(i), program, 0))
-    ).map(feedbackLoop).max
+    (5 to 9).toList.permutations.zipWithIndex
+      .map(
+        p => p._1.map(i => Amp(if (p._2 == 0) List(i, 0) else List(i), program, 0))
+      )
+      .map(feedbackLoop)
+      .max
   }
 
 }

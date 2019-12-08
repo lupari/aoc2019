@@ -18,7 +18,7 @@ object Day7 extends Challenge {
     @tailrec
     def acc(p: Int, xs: List[Int], in: List[Int], out: List[Int]): List[Int] = xs(p) match {
       case 99 => out
-      case 3 => acc(p + 2, xs.updated(xs(p + 1), in.head), in.drop(1), out)
+      case 3  => acc(p + 2, xs.updated(xs(p + 1), in.head), in.drop(1), out)
       case instr =>
         val (opcode, m1, m2, _) = parse(instr)
         val v1                  = value(xs, p + 1, m1)
@@ -46,9 +46,11 @@ object Day7 extends Challenge {
 
   override def run(): Any = {
     val program = Source.fromResource("day7.txt").mkString.split(",").map(_.trim.toInt).toList
-    (0 to 4).permutations.map(
-      seq => seq.foldLeft(0)((acc, i) => execute(program, List(i, acc)).head)
-    ).max
+    (0 to 4).permutations
+      .map(
+        seq => seq.foldLeft(0)((acc, i) => execute(program, List(i, acc)).head)
+      )
+      .max
   }
 
 }
