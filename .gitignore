@@ -4,4 +4,3 @@ target
 *.sc
 .idea
 .ensime*
-src/main/resources
