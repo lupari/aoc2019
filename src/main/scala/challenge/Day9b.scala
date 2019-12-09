@@ -5,7 +5,7 @@ import base.Challenge
 import scala.annotation.tailrec
 import scala.io.Source
 
-object Day9 extends Challenge {
+object Day9b extends Challenge {
 
   case class Output(sig: List[Long], p: Long, rb: Long, state: Map[Long, Long])
   val KILL: Long = -1
@@ -70,7 +70,7 @@ object Day9 extends Challenge {
     val input = Source.fromResource("day9.txt").mkString.split(",").map(_.trim.toLong).toList
     val program: Map[Long, Long] =
       input.zipWithIndex.map(x => x._2.toLong -> x._1).toMap.withDefaultValue(0)
-    execute(program, List(1)).sig.head
+    execute(program, List(2)).sig.head
   }
 
 }
