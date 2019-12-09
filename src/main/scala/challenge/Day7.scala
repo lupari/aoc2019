@@ -34,9 +34,9 @@ object Day7 extends Challenge {
             acc(if (v1 != 0) v2 else p + 3, xs, in, out)
           case 6 => // jmp-false
             acc(if (v1 == 0) v2 else p + 3, xs, in, out)
-          case 7 => // eq
+          case 7 => // lt
             acc(p + 4, xs.updated(xs(p + 3), if (v1 < v2) 1 else 0), in, out)
-          case 8 => // lt
+          case 8 => // eq
             acc(p + 4, xs.updated(xs(p + 3), if (v1 == v2) 1 else 0), in, out)
         }
     }
