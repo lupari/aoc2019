@@ -5,7 +5,7 @@ import base.{Challenge, IntCode => ic}
 import scala.annotation.tailrec
 import scala.io.Source
 
-object Day11 extends Challenge {
+object Day11b extends Challenge {
 
   case class Point(x: Int, y: Int)
   case class Dir(p: Point, dir: Char) {
@@ -38,7 +38,7 @@ object Day11 extends Challenge {
           }
       }
 
-    acc(grid, Dir(Point(0, 0), 'U'), Nil, ic.Input(program, List(0)))
+    acc(grid, Dir(Point(0, 0), 'U'), Nil, ic.Input(program, List(1)))
 
   }
 
@@ -46,8 +46,12 @@ object Day11 extends Challenge {
     val input = Source.fromResource("day11.txt").mkString.split(",").map(_.trim.toLong).toList
     val program: Map[Long, Long] =
       input.zipWithIndex.map(x => x._2.toLong -> x._1).toMap.withDefaultValue(0)
-    val grid: Map[Point, Char] = Map(Point(0, 0) -> '.').withDefaultValue('.')
-    paint(program, grid).size
+    val grid: Map[Point, Char] = Map(Point(0, 0) -> '#').withDefaultValue('.')
+    val paintJob               = paint(program, grid)
+    val (x, y)                 = (paintJob.keys.maxBy(_.x).x, paintJob.keys.maxBy(_.y).y)
+    val canvas                 = Array.tabulate(y + 1, x + 1)((_, _) => ' ')
+    for { p <- paintJob } yield canvas(p._1.y)(p._1.x) = if (p._2 == '#') '█' else ' '
+    canvas
   }
 
 }
