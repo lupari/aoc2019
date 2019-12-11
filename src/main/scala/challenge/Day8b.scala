@@ -10,7 +10,7 @@ object Day8b extends Challenge {
     val input: List[Char]        = Source.fromResource("day8.txt").mkString.trim.toList
     val layers: List[List[Char]] = input.grouped(25 * 6).toList
     val pic                      = layers.transpose.map(_.dropWhile(_ == '2').head).grouped(25).map(_.mkString).toList
-    pic.map(_ :+ '\n').mkString.replace('1', '#').replace('0', ' ')
+    pic.map(_ :+ '\n').mkString.replace('1', '█').replace('0', ' ')
   }
 
 }

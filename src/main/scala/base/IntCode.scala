@@ -4,14 +4,15 @@ import scala.annotation.tailrec
 
 object IntCode {
 
+  case class Input(program: Map[Long, Long],
+                   inputs: List[Int],
+                   pointer: Long = 0,
+                   rb: Long = 0,
+                   feedbackMode: Boolean = false)
   case class Output(sig: List[Long], p: Long, rb: Long, state: Map[Long, Long])
   val KILL: Long = -1
 
-  def execute(program: Map[Long, Long],
-              inputs: List[Int],
-              pointer: Long = 0,
-              rb: Long = 0,
-              feedbackMode: Boolean = false): Output = {
+  def execute(input: Input): Output = {
 
     def parse(d: Int): (Int, Int, Int, Int) =
       (d % 100, d / 100 % 10, d / 1000 % 10, d / 10000 % 10)
@@ -46,7 +47,7 @@ object IntCode {
                 case _ => Output(out, p, rb, xs) // halt as no input available
               }
             case 4 => // write
-              if (feedbackMode) Output(List(v1), p + 2, rb, xs)
+              if (input.feedbackMode) Output(List(v1), p + 2, rb, xs)
               else acc(p + 2, xs, in, rb, out :+ v1)
             case 5 => // jmp-true
               acc(if (v1 != 0) v2 else p + 3, xs, in, rb, out)
@@ -61,7 +62,7 @@ object IntCode {
           }
       }
 
-    acc(pointer, program, inputs, rb, Nil)
+    acc(input.pointer, input.program, input.inputs, input.rb, Nil)
   }
 
 }
