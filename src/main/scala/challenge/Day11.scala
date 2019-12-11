@@ -17,11 +17,13 @@ object Day11 extends Challenge {
     }
   }
 
-  def paint(program: Map[Long, Long], grid: Map[Point, Char]): Map[Point, Char] = {
+  def paint(program: ic.Program): Map[Point, Char] = {
+
+    val grid: Map[Point, Char] = Map(Point(0, 0) -> '.').withDefaultValue('.')
 
     @tailrec
     def acc(grid: Map[Point, Char], dir: Dir, out: List[Int], in: ic.Input): Map[Point, Char] =
-      ic.execute(in.copy(feedbackMode = true)) match {
+      ic.execute(in) match {
         case ic.Output(_, ic.KILL, _, _) => grid
         case ic.Output(sig, ptr, rb, state) =>
           out match {
@@ -29,25 +31,21 @@ object Day11 extends Challenge {
               val color     = if (h == 0) '.' else '#'
               val next      = dir.rotate(clockwise = sig.head == 1)
               val nextColor = if (grid(next.p) == '.') 0 else 1
-              val input     = ic.Input(state, List(nextColor), ptr, rb)
+              val input     = ic.Input(state, List(nextColor), Some(ic.Resume(ptr, rb)))
               acc(grid.updated(dir.p, color), next, Nil, input)
             case _ =>
               val color = sig.head.toInt
-              val input = ic.Input(state, Nil, ptr, rb)
+              val input = ic.Input(state, Nil, Some(ic.Resume(ptr, rb)))
               acc(grid, dir, List(color), input)
           }
       }
 
-    acc(grid, Dir(Point(0, 0), 'U'), Nil, ic.Input(program, List(0)))
-
+    acc(grid, Dir(Point(0, 0), 'U'), Nil, ic.Input(program, List(0), Some(ic.Resume(0, 0))))
   }
 
   override def run(): Any = {
-    val input = Source.fromResource("day11.txt").mkString.split(",").map(_.trim.toLong).toList
-    val program: Map[Long, Long] =
-      input.zipWithIndex.map(x => x._2.toLong -> x._1).toMap.withDefaultValue(0)
-    val grid: Map[Point, Char] = Map(Point(0, 0) -> '.').withDefaultValue('.')
-    paint(program, grid).size
+    val program = ic.read(Source.fromResource("day11.txt"))
+    paint(program).size
   }
 
 }
