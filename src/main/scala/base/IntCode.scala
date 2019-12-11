@@ -1,32 +1,34 @@
 package base
 
+import scala.io.Source
 import scala.annotation.tailrec
 
 object IntCode {
 
-  case class Input(program: Map[Long, Long],
-                   inputs: List[Int],
-                   pointer: Long = 0,
-                   rb: Long = 0,
-                   feedbackMode: Boolean = false)
-  case class Output(sig: List[Long], p: Long, rb: Long, state: Map[Long, Long])
+  type Program = Map[Long, Long]
+  case class Resume(pointer: Long, rb: Long)
+  case class Input(program: Program, inputs: List[Int], resume: Option[Resume] = None)
+  case class Output(sig: List[Long], p: Long, rb: Long, state: Program)
   val KILL: Long = -1
+
+  def read(src: Source): Program = src.mkString.split(",").map(_.trim.toLong)
+    .zipWithIndex.map(x => x._2.toLong -> x._1).toMap.withDefaultValue(0)
 
   def execute(input: Input): Output = {
 
     def parse(d: Int): (Int, Int, Int, Int) =
       (d % 100, d / 100 % 10, d / 1000 % 10, d / 10000 % 10)
 
-    def index(xs: Map[Long, Long], index: Long, rb: Long, mode: Int): Long = mode match {
+    def index(xs: Program, index: Long, rb: Long, mode: Int): Long = mode match {
       case 0 => xs(index)
       case 1 => index
       case 2 => rb + xs(index)
     }
 
-    def value(xs: Map[Long, Long], i: Long, rb: Long, mode: Int) = xs(index(xs, i, rb, mode))
+    def value(xs: Program, i: Long, rb: Long, mode: Int) = xs(index(xs, i, rb, mode))
 
     @tailrec
-    def acc(p: Long, xs: Map[Long, Long], in: List[Int], rb: Long, out: List[Long]): Output =
+    def acc(p: Long, xs: Program, in: List[Int], rb: Long, out: List[Long]): Output =
       xs(p) match {
         case 99 => Output(out, KILL, rb, xs)
         case instr =>
@@ -47,8 +49,10 @@ object IntCode {
                 case _ => Output(out, p, rb, xs) // halt as no input available
               }
             case 4 => // write
-              if (input.feedbackMode) Output(List(v1), p + 2, rb, xs)
-              else acc(p + 2, xs, in, rb, out :+ v1)
+              input.resume match {
+                case Some(_) => Output(List(v1), p + 2, rb, xs)
+                case None => acc(p + 2, xs, in, rb, out :+ v1)
+              }
             case 5 => // jmp-true
               acc(if (v1 != 0) v2 else p + 3, xs, in, rb, out)
             case 6 => // jmp-false
@@ -62,7 +66,9 @@ object IntCode {
           }
       }
 
-    acc(input.pointer, input.program, input.inputs, input.rb, Nil)
+    val pointer: Long = input.resume.map(_.pointer).getOrElse(0)
+    val rb: Long = input.resume.map(_.rb).getOrElse(0)
+    acc(pointer, input.program, input.inputs, rb, Nil)
   }
 
 }
