@@ -47,16 +47,15 @@ object Day12b extends Challenge {
 
   def cycleLength[A, B](xs: List[A])(f: List[A] => List[A])(g: A => B): Int = {
     val memo: mutable.Map[List[B], List[B]] = mutable.Map()
-    val it: Iterator[(List[A], List[A])] =
-      Iterator.iterate((xs, Nil))(p => (f(p._1), p._2))
-    it.zipWithIndex
+    Iterator.iterate((xs, Nil))(p => (f(p._1), p._2))
+      .zipWithIndex
       .map(x => (x._2, memo.put(x._1._1.map(g), x._1._2.map(g))))
       .dropWhile(x => x._2.isEmpty)
       .next
       ._1
   }
 
-  def findCycleLength(moons: List[Moon]): Long = {
+  def stepsUntilIdentical(moons: List[Moon]): Long = {
     val f   = cycleLength(moons)(applyMovement) _
     val clx = f(m => (m.pos.x, m.velocity.x))
     val cly = f(m => (m.pos.y, m.velocity.y))
@@ -70,7 +69,7 @@ object Day12b extends Challenge {
 
   override def run(): Any = {
     val moons: List[Moon] = Source.fromResource("day12.txt").getLines.map(parse).toList
-    findCycleLength(moons)
+    stepsUntilIdentical(moons)
   }
 
 }
