@@ -11,8 +11,14 @@ object IntCode {
   case class Output(sig: List[Long], p: Long, rb: Long, state: Program)
   val KILL: Long = -1
 
-  def read(src: Source): Program = src.mkString.split(",").map(_.trim.toLong)
-    .zipWithIndex.map(x => x._2.toLong -> x._1).toMap.withDefaultValue(0)
+  def read(src: Source): Program =
+    src.mkString
+      .split(",")
+      .map(_.trim.toLong)
+      .zipWithIndex
+      .map(x => x._2.toLong -> x._1)
+      .toMap
+      .withDefaultValue(0)
 
   def execute(input: Input): Output = {
 
@@ -51,7 +57,7 @@ object IntCode {
             case 4 => // write
               input.resume match {
                 case Some(_) => Output(List(v1), p + 2, rb, xs)
-                case None => acc(p + 2, xs, in, rb, out :+ v1)
+                case None    => acc(p + 2, xs, in, rb, out :+ v1)
               }
             case 5 => // jmp-true
               acc(if (v1 != 0) v2 else p + 3, xs, in, rb, out)
@@ -67,7 +73,7 @@ object IntCode {
       }
 
     val pointer: Long = input.resume.map(_.pointer).getOrElse(0)
-    val rb: Long = input.resume.map(_.rb).getOrElse(0)
+    val rb: Long      = input.resume.map(_.rb).getOrElse(0)
     acc(pointer, input.program, input.inputs, rb, Nil)
   }
 
