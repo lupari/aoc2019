@@ -7,7 +7,7 @@ object IntCode {
 
   type Program = Map[Long, Long]
   case class Resume(pointer: Long, rb: Long)
-  case class Input(program: Program, inputs: List[Int], resume: Option[Resume] = None)
+  case class Input(program: Program, in: List[Int], resume: Option[Resume] = None)
   case class Output(sig: List[Long], p: Long, rb: Long, state: Program)
   val KILL: Long = -1
 
@@ -74,7 +74,7 @@ object IntCode {
 
     val pointer: Long = input.resume.map(_.pointer).getOrElse(0)
     val rb: Long      = input.resume.map(_.rb).getOrElse(0)
-    acc(pointer, input.program, input.inputs, rb, Nil)
+    acc(pointer, input.program, input.in, rb, Nil)
   }
 
 }

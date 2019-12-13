@@ -7,51 +7,33 @@ import scala.io.Source
 
 object Day13b extends Challenge {
 
-  case class Point(x: Int, y: Int)
+  case class Game(ball: Int = 0, paddle: Int = 0, score: Int = 0)
 
   def play(program: ic.Program): Int = {
 
-    def panel(i: Int): Char = i match {
-      case 0 => ' '
-      case 1 => '#'
-      case 2 => 'X'
-      case 3 => 'P'
-      case 4 => 'o'
-    }
-
-    def nextMove(b: Int, p: Int): Int = p match {
-      case x if x > b  => -1
-      case x if x < b  => 1
-      case x if x == b => 0
-    }
-
     @tailrec
-    def acc(xs: Map[Point, Char], out: List[Int], in: ic.Input, ctrl: (Int, Int), score: Int): Int =
-      ic.execute(in) match {
-        case ic.Output(_, ic.KILL, _, _) => score // game over
+    def acc(in: ic.Input, out: List[Int], game: Game): Int = {
+      val output = ic.execute(in)
+      val input = ic.Input(output.state, Nil, Some(ic.Resume(output.p, output.rb)))
+      output match {
+        case ic.Output(_, ic.KILL, _, _) => game.score // game over
         case ic.Output(Nil, ptr, rb, state) => // input wanted
-          val move  = nextMove(ctrl._1, ctrl._2)
-          val input = ic.Input(state, List(move), Some(ic.Resume(ptr, rb)))
-          acc(xs, Nil, input, ctrl, score)
+          val move = game.ball.compare(game.paddle)
+          acc(input.copy(in = List(move)), Nil, game)
         case ic.Output(sig, ptr, rb, state) =>
           out match {
             case h :: i :: _ if (h == -1 && i == 0) => // score
-              val input = ic.Input(state, Nil, Some(ic.Resume(ptr, rb)))
-              acc(xs, Nil, input, ctrl, sig.head.toInt)
-            case h :: i :: _ => // display buffer full
-              val item  = panel(sig.head.toInt)
-              val ballX = if (item == 'o') h else ctrl._1
-              val padX  = if (item == 'P') h else ctrl._2
-              val input = ic.Input(state, Nil, Some(ic.Resume(ptr, rb)))
-              acc(xs.updated(Point(h, i), item), Nil, input, (ballX, padX), score)
-            case _ => // display buffer event
-              val input = ic.Input(state, Nil, Some(ic.Resume(ptr, rb)))
-              acc(xs, out :+ sig.head.toInt, input, ctrl, score)
+              acc(input, Nil, game.copy(score = sig.head.toInt))
+            case h :: i :: _ => // tile type received
+              val ball = if (sig.head == 4) h else game.ball
+              val paddle  = if (sig.head == 3) h else game.paddle
+              acc(input, Nil, game.copy(ball = ball, paddle = paddle))
+            case _ => // coords received
+              acc(input, out :+ sig.head.toInt, game)
           }
       }
-
-    val grid: Map[Point, Char] = Map().withDefaultValue(' ')
-    acc(grid, Nil, ic.Input(program, Nil, Some(ic.Resume(0, 0))), (-1, -1), 0)
+    }
+    acc(ic.Input(program, Nil, Some(ic.Resume(0, 0))), Nil, Game())
   }
 
   override def run(): Any = {
