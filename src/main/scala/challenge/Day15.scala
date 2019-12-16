@@ -31,32 +31,27 @@ object Day15 extends Challenge {
   def search(program: ic.Program): Map[Square, Int] = {
 
     @tailrec
-    def acc(in: ic.Input, curr: Square, grid: Map[Square, Int], t: Long): Map[Square, Int] = {
-      if (t > 100000) grid
-      else {
-        val nextSquare: Square = curr.next(in.in.head)
-        ic.execute(in) match {
-          case ic.Output(sig, ptr, rb, state) => // input wanted
-            val newGrid = grid.updated(nextSquare, sig.head.toInt)
-            sig.head.toInt match {
-              case 0 => // next would hit wall
-                val dir   = nextMove(newGrid, curr)
-                val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
-                acc(input, curr, newGrid, t + 1)
-              case 1 => // next would be ok
-                val dir   = nextMove(newGrid, nextSquare)
-                val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
-                acc(input, nextSquare, newGrid, t + 1)
-              case 2 => // next would reach goal
-                val dir   = nextMove(newGrid, nextSquare)
-                val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
-                acc(input, nextSquare, newGrid, t + 1)
-            }
-        }
+    def acc(in: ic.Input, curr: Square, grid: Map[Square, Int]): Map[Square, Int] = {
+      val nextSquare: Square = curr.next(in.in.head)
+      ic.execute(in) match {
+        case ic.Output(sig, ptr, rb, state) => // input wanted
+          val newGrid = grid.updated(nextSquare, sig.head.toInt)
+          sig.head.toInt match {
+            case 0 => // next would hit wall
+              val dir   = nextMove(newGrid, curr)
+              val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
+              acc(input, curr, newGrid)
+            case 1 => // next would be ok
+              val dir   = nextMove(newGrid, nextSquare)
+              val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
+              acc(input, nextSquare, newGrid)
+            case 2 => // next would reach goal
+              grid.updated(nextSquare, 2)
+          }
       }
     }
 
-    acc(ic.Input(program, List(1), Some(ic.Resume(0, 0))), Square(0, 0), Map(Square(0, 0) -> 0), 0)
+    acc(ic.Input(program, List(1), Some(ic.Resume(0, 0))), Square(0, 0), Map(Square(0, 0) -> 0))
   }
 
   object AStar {
