@@ -22,7 +22,7 @@ object Day14 extends Challenge {
 
           val surplusAmount = surplus(chemical) - n + needed
           val (ore, surplusProduced) =
-            requirements.foldLeft((0L, surplus.updated(chemical, surplusAmount)))((a, b) => {
+            requirements.foldLeft((0, surplus.updated(chemical, surplusAmount)))((a, b) => {
               val (o2, s2) = acc(b._1, repeats * b._2, a._2)
               (a._1 + o2, s2)
             })

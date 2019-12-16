@@ -48,7 +48,6 @@ object Day15 extends Challenge {
                 val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
                 acc(input, nextSquare, newGrid, t + 1)
               case 2 => // next would reach goal
-                println(t + ": 2 found in " + nextSquare)
                 val dir   = nextMove(newGrid, nextSquare)
                 val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
                 acc(input, nextSquare, newGrid, t + 1)
