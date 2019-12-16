@@ -13,9 +13,9 @@ object Day16b extends Challenge {
       Source.fromResource("day16.txt").mkString.trim.toIndexedSeq.map(_.asDigit)
     val offset: Int = input.take(7).mkString.toInt
     val n = 10000 * input.length - offset
-    val remainder = input.drop(offset % input.length)
     val repeat = (n - offset % input.length - 1) / input.length + 1
-    val signal = remainder ++ Iterator.continually(input).flatten.take(repeat * input.length).toList
+    val signal = input.drop(offset % input.length) ++
+      Iterator.continually(input).flatten.take(repeat * input.length).toList
 
     @tailrec
     def acc(xs: IndexedSeq[Int], i: Int, n: Int): IndexedSeq[Int] = i match {

@@ -30,8 +30,12 @@ object Day15b extends Challenge {
   def search(program: ic.Program, bound: Int): Map[Square, Int] = {
 
     @tailrec
-    def acc(in: ic.Input, curr: Square, grid: Map[Square, Int], t: Long): Map[Square, Int] = {
-      if (t > bound) grid
+    def acc(in: ic.Input,
+            curr: Square,
+            grid: Map[Square, Int],
+            t: Long,
+            goalFound: Boolean = false): Map[Square, Int] = {
+      if (t > bound && goalFound) grid
       else {
         val nextSquare: Square = curr.next(in.in.head)
         ic.execute(in) match {
@@ -41,11 +45,11 @@ object Day15b extends Challenge {
               case 0 => // next would hit wall
                 val dir   = nextMove(newGrid, curr)
                 val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
-                acc(input, curr, newGrid, t + 1)
+                acc(input, curr, newGrid, t + 1, goalFound)
               case _ => // next would be ok
                 val dir   = nextMove(newGrid, nextSquare)
                 val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
-                acc(input, nextSquare, newGrid, t + 1)
+                acc(input, nextSquare, newGrid, t + 1, if (sig.head.toInt == 2) true else goalFound)
             }
         }
       }
