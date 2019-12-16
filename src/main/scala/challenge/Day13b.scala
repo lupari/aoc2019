@@ -14,7 +14,7 @@ object Day13b extends Challenge {
     @tailrec
     def acc(in: ic.Input, out: List[Int], game: Game): Int = {
       val output = ic.execute(in)
-      val input = ic.Input(output.state, Nil, Some(ic.Resume(output.p, output.rb)))
+      val input  = ic.Input(output.state, Nil, Some(ic.Resume(output.p, output.rb)))
       output match {
         case ic.Output(_, ic.KILL, _, _) => game.score // game over
         case ic.Output(Nil, ptr, rb, state) => // input wanted
@@ -25,8 +25,8 @@ object Day13b extends Challenge {
             case h :: i :: _ if (h == -1 && i == 0) => // score
               acc(input, Nil, game.copy(score = sig.head.toInt))
             case h :: i :: _ => // tile type received
-              val ball = if (sig.head == 4) h else game.ball
-              val paddle  = if (sig.head == 3) h else game.paddle
+              val ball   = if (sig.head == 4) h else game.ball
+              val paddle = if (sig.head == 3) h else game.paddle
               acc(input, Nil, game.copy(ball = ball, paddle = paddle))
             case _ => // coords received
               acc(input, out :+ sig.head.toInt, game)
