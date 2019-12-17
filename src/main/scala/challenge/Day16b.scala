@@ -11,6 +11,7 @@ object Day16b extends Challenge {
   override def run(): Any = {
     val input: IndexedSeq[Int] =
       Source.fromResource("day16.txt").mkString.trim.toIndexedSeq.map(_.asDigit)
+
     val offset: Int = input.take(7).mkString.toInt
     val n = 10000 * input.length - offset
     val repeat = (n - offset % input.length - 1) / input.length + 1
