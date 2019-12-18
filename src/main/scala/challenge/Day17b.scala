@@ -127,15 +127,13 @@ object Day17b extends Challenge {
     (ia ++ ib ++ ic).sortBy(_._1).map(_._2)
   }
 
-  def punctuated(xs: List[String]): List[Char] = {
-    def punctuate(s: String): List[Char] = s match {
-      case x if x.length == 2 => List(x.head, x.last, ',')
-      case _                  => List(s.head, ',')
-    }
+  def ascii1(xs: List[Char]): List[Char] = xs.flatMap(List(_) :+ ',').dropRight(1) :+ '\n'
+  def asciiN(xs: List[String]): List[Char] = {
+    def punctuate(s: String): List[Char] =
+      if (s.length == 2) List(s.head, s.last, ',') else List(s.head, ',')
+
     xs.flatMap(x => List(x.head, x.drop(1))).map(_.toString).flatMap(punctuate).dropRight(1) :+ '\n'
   }
-
-  def punctuated1(xs: List[Char]): List[Char] = xs.flatMap(List(_) :+ ',').dropRight(1) :+ '\n'
 
   def dustCount(prog: ic.Program,
                 main: List[Char],
@@ -152,10 +150,10 @@ object Day17b extends Challenge {
     val grid      = getGrid(output)
     val path      = compress(getPath(grid).mkString)
     val movements = findMovements(path)
-    val seqM      = punctuated1(mainRoutine(path, movements))
-    val seqA      = punctuated(movements.head)
-    val seqB      = punctuated(movements.drop(1).head)
-    val seqC      = punctuated(movements.last)
+    val seqM      = ascii1(mainRoutine(path, movements))
+    val seqA      = asciiN(movements.head)
+    val seqB      = asciiN(movements.drop(1).head)
+    val seqC      = asciiN(movements.last)
 
     dustCount(program, seqM, seqA, seqB, seqC)
   }
