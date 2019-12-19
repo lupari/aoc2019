@@ -2,45 +2,53 @@ package challenge
 
 import base.{Challenge, IntCode => ic}
 
+import scala.annotation.tailrec
 import scala.io.Source
 
 object Day19b extends Challenge {
 
-  case class Point(x: Int, y: Int) {
-    def toInput: List[Int] = List(x, y)
-  }
+  def search(n: Int, lower: Int = 0, upper: Int = 10000)(check: (Int, Int) => Boolean)(
+      ok: (Int, Int) => Boolean): Int = {
 
-  type Grid = Map[Point, Char]
-
-  def findPoint(program: ic.Program, size: Int): Point = {
-
-    def beginning(y: Int): Int = {
-      Iterator
-        .iterate((size, 0))(x => {
-          (x._1 + 1, ic.execute(ic.Input(program, List(x._1, y))).sig.head.toInt)
-        })
-        .dropWhile(_._2 == 0)
-        .next
-        ._1 - 1
+    @tailrec
+    def bs(min: Int, max: Int): Int = {
+      if (min == max - 1) min
+      else {
+        val mid = (min + max) / 2
+        if (check(mid, n)) bs(min, mid)
+        else bs(mid, max)
+      }
     }
 
-    val (x, y) = Iterator
-      .iterate((size * 2, 0, (0, 0)))(y => {
-        val x   = beginning(y._1)
-        val out = ic.execute(ic.Input(program, List(x + size - 1, y._1 - size + 1))).sig.head.toInt
-        (y._1 + 1, out, (x, y._1))
+    Iterator
+      .iterate((lower, upper, -1))(range => {
+        val result = bs(range._1, range._2) + 1
+        if (ok(result, n)) (0, 0, result)
+        else {
+          val mid  = (range._1 + range._2) / 2
+          val next = if (!check(result, n)) (range._1, mid, -1) else (mid, range._2, -1)
+          if (next._1 == next._2 - 1) (0, 0, result) else next
+        }
       })
-      .dropWhile(_._2 == 0)
+      .dropWhile(_._3 == -1)
       .next
       ._3
-
-    Point(x, y - size + 1)
   }
 
   override def run(): Any = {
-    val program = ic.read(Source.fromResource("day19.txt"))
-    val point   = findPoint(program, 100)
-    point.x * 10000 + point.y
+    val program               = ic.read(Source.fromResource("day19.txt"))
+    def check(x: Int, y: Int) = ic.execute(ic.Input(program, List(x, y))).sig.head == 1
+    def ok(x: Int, y: Int)    = check(x, y) && check(x + 99, y - 99)
+
+    val (x, y, _) = Iterator
+      .iterate((2 * 100, -1, -1))(range => {
+        val x = search(range._1, lower = 2 * 100)(check)(ok)
+        if (ok(x, range._1)) (x, range._1, 1) else (range._1 + 1, -1, -1)
+      })
+      .dropWhile(_._3 == -1)
+      .next
+    x * 10000 + y - 99
+
   }
 
 }
