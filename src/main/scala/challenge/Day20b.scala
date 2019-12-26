@@ -54,8 +54,8 @@ object Day20b extends Challenge {
     }
   }
 
-  def portType(s: Point)(implicit g: Grid): Int = // 1 = inner, -1 = outer
-    if (s.x > 3 && s.x < g.keys.maxBy(_.x).x - 3 && s.y > 3 && s.y < g.keys.maxBy(_.y).y - 3) 1
+  def portType(s: Point, x: Int, y: Int): Int = // 1 = inner, -1 = outer
+    if (s.x > 3 && s.x < x - 3 && s.y > 3 && s.y < y - 3) 1
     else -1
 
   def canEnter(level: Int, portType: Int, label: String): Boolean = level match {
@@ -67,7 +67,7 @@ object Day20b extends Challenge {
     val open = s.neighbors.filter(grid(_) == '.').map((_, 0))
     s.neighbors.find(grid(_).isLetter) match {
       case Some(port) =>
-        val pt = portType(port)
+        val pt = portType(port, grid.keys.map(_.x).max, grid.keys.map(_.y).max)
         teleport(port) match {
           case Some((tp, lbl)) =>
             if (canEnter(level, pt, lbl)) open :+ (tp, pt) else open
