@@ -6,7 +6,7 @@ import scala.io.Source
 
 object Day7 extends Challenge {
 
-  def execute(program: ic.Program, inputs: List[Int]): List[Int] = {
+  def execute(program: ic.Program, inputs: List[Long]): List[Int] = {
     ic.execute(ic.Input(program, inputs)).sig.map(_.toInt)
   }
 

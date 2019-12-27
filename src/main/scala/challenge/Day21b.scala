@@ -12,7 +12,7 @@ object Day21b extends Challenge {
     // working input
     val input = List("NOT H T", "OR C T", "AND B T", "AND A T", "NOT T J", "AND D J", "RUN")
       .flatMap(_.toList :+ '\n')
-      .map(_.toInt)
+      .map(_.toLong)
     val output = ic.execute(ic.Input(program, input))
     // Console.err.println(output.sig.map(_.toChar).mkString)
     output.sig.last.toInt

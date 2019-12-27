@@ -7,7 +7,7 @@ import scala.io.Source
 
 object Day7b extends Challenge {
 
-  case class Amp(in: List[Int], program: ic.Program, pointer: Long = 0)
+  case class Amp(in: List[Long], program: ic.Program, pointer: Long = 0)
 
   def amplify(amp: Amp): ic.Output =
     ic.execute(ic.Input(amp.program, amp.in, Some(ic.Resume(amp.pointer, rb = 0))))
