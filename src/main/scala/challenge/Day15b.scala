@@ -37,7 +37,7 @@ object Day15b extends Challenge {
             goalFound: Boolean = false): Map[Square, Int] = {
       if (t > bound && goalFound) grid
       else {
-        val nextSquare: Square = curr.next(in.in.head)
+        val nextSquare: Square = curr.next(in.in.head.toInt)
         ic.execute(in) match {
           case ic.Output(sig, ptr, rb, state) => // input wanted
             val newGrid = grid.updated(nextSquare, sig.head.toInt)
