@@ -6,7 +6,7 @@ import scala.io.Source
 
 object Day9b extends Challenge {
 
-  def execute(program: Map[Long, Long], inputs: List[Int]): ic.Output =
+  def execute(program: Map[Long, Long], inputs: List[Long]): ic.Output =
     ic.execute(ic.Input(program, inputs))
 
   override def run(): Any = {
