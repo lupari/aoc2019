@@ -7,7 +7,7 @@ object IntCode {
 
   type Program = Map[Long, Long]
   case class Resume(pointer: Long, rb: Long)
-  case class Input(program: Program, in: List[Int], resume: Option[Resume] = None)
+  case class Input(program: Program, in: List[Long], resume: Option[Resume] = None)
   case class Output(sig: List[Long], p: Long, rb: Long, state: Program)
   val KILL: Long = -1
 
@@ -34,7 +34,7 @@ object IntCode {
     def value(xs: Program, i: Long, rb: Long, mode: Int) = xs(index(xs, i, rb, mode))
 
     @tailrec
-    def acc(p: Long, xs: Program, in: List[Int], rb: Long, out: List[Long]): Output =
+    def acc(p: Long, xs: Program, in: List[Long], rb: Long, out: List[Long]): Output =
       xs(p) match {
         case 99 => Output(out, KILL, rb, xs)
         case instr =>
