@@ -3,12 +3,13 @@ package challenge
 import base.Challenge
 
 import scala.io.Source
+import scala.util.matching.Regex
 
 object Day22b extends Challenge {
 
   case class Instruction(op: Int, n: Option[Int])
 
-  val pattern = "(.*) (-?\\d+)$".r
+  val pattern: Regex = "(.*) (-?\\d+)$".r
   def parse(s: String): Instruction = s match {
     case "deal into new stack"                       => Instruction(0, None)
     case pattern(a, b) if a == "deal with increment" => Instruction(1, Some(b.toInt))
@@ -21,7 +22,7 @@ object Day22b extends Challenge {
   def **%(a: Long, b: Long, m: Long): Long          = %%(**(a, b), m)
   def *+%(a: Long, b: Long, c: Long, m: Long): Long = ((**(a, b) + c) % m).toLong
 
-  def inverse(instr: Instruction, a: Long, b: Long, m: Long) = instr match {
+  def inverse(instr: Instruction, a: Long, b: Long, m: Long): (Long, Long) = instr match {
     case Instruction(0, None)    => ((-a) % m, (-b - 1) % m)
     case Instruction(1, Some(n)) => (**%(a, n, m), **%(b, n, m))
     case Instruction(2, Some(n)) => (a, (b - n) % m)
