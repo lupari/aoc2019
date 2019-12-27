@@ -67,9 +67,9 @@ object Day20b extends Challenge {
     val open = s.neighbors.filter(grid(_) == '.').map((_, 0))
     s.neighbors.find(grid(_).isLetter) match {
       case Some(port) =>
-        val pt = portType(port, grid.keys.map(_.x).max, grid.keys.map(_.y).max)
         teleport(port) match {
           case Some((tp, lbl)) =>
+            val pt = portType(port, grid.keys.map(_.x).max, grid.keys.map(_.y).max)
             if (canEnter(level, pt, lbl)) open :+ (tp, pt) else open
           case None => open
         }
