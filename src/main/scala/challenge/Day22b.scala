@@ -31,7 +31,7 @@ object Day22b extends Challenge {
 
   def shuffle(xs: List[Instruction], pos: Int, n: Long, k: Long): Long = {
 
-    def exp(a: Long, b: Long, c: Long, d: Long, e: Long) = {
+    def exp(a: Long, b: Long, c: Long, d: Long, e: Long): (Long, Long, Long, Long, Long) = {
       val e2 = e >> 1
       val b2 = *+%(a, b, b, n)
       val a2 = **%(a, a, n)
