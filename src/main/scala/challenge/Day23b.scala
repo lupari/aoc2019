@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 import scala.io.Source
 
-object Day23 extends Challenge {
+object Day23b extends Challenge {
 
   case class Packet(addr: Int, x: Long, y: Long) {
     def coords = List(x, y)
@@ -16,7 +16,9 @@ object Day23 extends Challenge {
   def operate(program: ic.Program): Long = {
 
     @tailrec
-    def execute(computers: List[Computer]): Long = {
+    def execute(computers: List[Computer],
+                natReg: Option[Packet] = None,
+                natSent: Option[Packet] = None): Long = {
       val outcome: List[(Computer, Option[Packet])] = computers
         .map(c => (c, ic.execute(c.state)))
         .map({
@@ -38,17 +40,23 @@ object Day23 extends Challenge {
             }
         })
 
-      val packets = outcome.flatMap(_._2)
-      packets.find(_.addr == 255) match {
-        case Some(packet) => packet.y
-        case None =>
-          val computers2 = outcome
-            .map(_._1)
-            .zipWithIndex
+      val computers2 = outcome.map(_._1)
+      (outcome.flatMap(_._1.outBuf), natReg) match {
+        case (Nil, Some(nr)) =>
+          natSent match {
+            case Some(ns) if nr.y == ns.y => ns.y
+            case _ => // idle network
+              val computer0  = computers2.head
+              val computers3 = computers2.updated(0, computer0.copy(q = computer0.q :+ nr))
+              execute(computers3, natSent = Some(nr))
+          }
+        case _ =>
+          val outPackets = outcome.flatMap(_._2)
+          val computers3 = computers2.zipWithIndex
             .map({
-              case (computer, i) => computer.copy(q = computer.q ++ packets.filter(_.addr == i))
+              case (computer, i) => computer.copy(q = computer.q ++ outPackets.filter(_.addr == i))
             })
-          execute(computers2)
+          execute(computers3, outPackets.find(_.addr == 255), natSent)
       }
     }
 
