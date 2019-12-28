@@ -16,8 +16,8 @@ object Day23 extends Challenge {
   def operate(program: ic.Program): Long = {
 
     @tailrec
-    def execute(computers: List[Computer]): Long = {
-      val outcome: List[(Computer, Option[Packet])] = computers
+    def execute(computers: Seq[Computer]): Long = {
+      val outcome: Seq[(Computer, Option[Packet])] = computers
         .map(c => (c, ic.execute(c.state)))
         .map({
           case (computer, output) =>
@@ -52,10 +52,9 @@ object Day23 extends Challenge {
       }
     }
 
-    val booted: List[Computer] = (0 until 50)
+    val booted = (0 until 50)
       .map(i => ic.execute(ic.Input(program, List(i), Some(ic.Resume(0, 0)))))
       .map(o => Computer(ic.Input(o.state, Nil, Some(ic.Resume(o.p, o.rb))), Nil, Queue.empty))
-      .toList
 
     execute(booted)
   }
