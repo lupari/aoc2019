@@ -16,10 +16,10 @@ object Day23b extends Challenge {
   def operate(program: ic.Program): Long = {
 
     @tailrec
-    def execute(computers: List[Computer],
+    def execute(computers: Seq[Computer],
                 natReg: Option[Packet] = None,
                 natSent: Option[Packet] = None): Long = {
-      val outcome: List[(Computer, Option[Packet])] = computers
+      val outcome: Seq[(Computer, Option[Packet])] = computers
         .map(c => (c, ic.execute(c.state)))
         .map({
           case (computer, output) =>
@@ -30,18 +30,16 @@ object Day23b extends Challenge {
             val c2    = computer.copy(state = state, q = q)
             output.sig match {
               case h :: _ =>
-                computer.outBuf match {
-                  case i :: j :: _ =>
-                    (c2.copy(outBuf = Nil), Some(Packet(i.toInt, j, h)))
-                  case _ =>
-                    (c2.copy(outBuf = c2.outBuf :+ h), None)
+                c2.outBuf match {
+                  case i :: j :: _ => (c2.copy(outBuf = Nil), Some(Packet(i.toInt, j, h)))
+                  case _           => (c2.copy(outBuf = c2.outBuf :+ h), None)
                 }
               case _ => (c2, None)
             }
         })
 
       val computers2 = outcome.map(_._1)
-      (outcome.flatMap(_._1.outBuf), natReg) match {
+      (computers2.flatMap(_.outBuf), natReg) match {
         case (Nil, Some(nr)) =>
           natSent match {
             case Some(ns) if nr.y == ns.y => ns.y
@@ -51,19 +49,18 @@ object Day23b extends Challenge {
               execute(computers3, natSent = Some(nr))
           }
         case _ =>
-          val outPackets = outcome.flatMap(_._2)
+          val packets = outcome.flatMap(_._2)
           val computers3 = computers2.zipWithIndex
             .map({
-              case (computer, i) => computer.copy(q = computer.q ++ outPackets.filter(_.addr == i))
+              case (computer, i) => computer.copy(q = computer.q ++ packets.filter(_.addr == i))
             })
-          execute(computers3, outPackets.find(_.addr == 255), natSent)
+          execute(computers3, packets.find(_.addr == 255), natSent)
       }
     }
 
-    val booted: List[Computer] = (0 until 50)
+    val booted = (0 until 50)
       .map(i => ic.execute(ic.Input(program, List(i), Some(ic.Resume(0, 0)))))
       .map(o => Computer(ic.Input(o.state, Nil, Some(ic.Resume(o.p, o.rb))), Nil, Queue.empty))
-      .toList
 
     execute(booted)
   }
