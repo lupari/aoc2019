@@ -40,10 +40,10 @@ object Day23b extends Challenge {
 
       val computers2 = outcome.map(_._1)
       (computers2.flatMap(_.outBuf), natReg) match {
-        case (Nil, Some(nr)) =>
+        case (Nil, Some(nr)) => // idle network
           natSent match {
             case Some(ns) if nr.y == ns.y => ns.y
-            case _ => // idle network
+            case _ =>
               val computer0  = computers2.head
               val computers3 = computers2.updated(0, computer0.copy(q = computer0.q :+ nr))
               execute(computers3, natSent = Some(nr))
