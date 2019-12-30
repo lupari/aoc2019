@@ -11,8 +11,8 @@ object Day24b extends Challenge {
   }
   object Point {
     def adj: List[Point] = List(Point(1, 0), Point(-1, 0), Point(0, 1), Point(0, -1))
-    def center: Point    = Point(2, 2)
   }
+  val center = Point(2, 2)
   type PointAtLevel = (Int, Point)
   type Grid         = List[List[Char]]
   type Grids        = Map[Int, Grid]
@@ -34,6 +34,7 @@ object Day24b extends Challenge {
                 case Point(-1, 0) => List.tabulate(5)(y => (level + 1, Point(4, y)))
                 case Point(0, 1)  => List.tabulate(5)(x => (level + 1, Point(x, 0)))
                 case Point(0, -1) => List.tabulate(5)(x => (level + 1, Point(x, 4)))
+                case _            => throw new NoSuchElementException
               }
             case point => List((level, point))
         })
@@ -50,7 +51,7 @@ object Day24b extends Challenge {
                 row.zipWithIndex.map({
                   case (col, x) =>
                     Point(x, y) match {
-                      case Point.center => '?'
+                      case Point(2, 2) => '?'
                       case point =>
                         val adj = neighbors((level, point)).map({
                           case (level, p) => gs.getOrElse(level, newGrid)(p.y)(p.x)
