@@ -5,7 +5,7 @@ class Test23 extends flatspec.AnyFlatSpec with matchers.should.Matchers {
 
   it should "calculate correct result" in {
 
-    Day23.run() should be(1644352419829L)
+    Day23.run() should be(20764)
 
   }
 }
