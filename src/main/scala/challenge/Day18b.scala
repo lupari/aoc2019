@@ -14,6 +14,7 @@ object Day18b extends Challenge {
     def corners =
       List(Point(x - 1, y - 1), Point(x + 1, y - 1), Point(x - 1, y + 1), Point(x + 1, y + 1))
   }
+  case class Key(dist: Int, point: Point, key: Char)
 
   def getGrid(input: List[Char]): (Map[Point, Char], Seq[Point]) = {
 
@@ -31,81 +32,65 @@ object Day18b extends Challenge {
 
     val grid      = acc(input, Map.empty.withDefaultValue(' '), Point(0, 0))
     val start     = grid.find(_._2 == '@').get
-    val newStarts = start._1.corners.map(c => c -> '@').toMap
+    val entrances = start._1.corners.map(c => c -> '@').toMap
     val newWalls  = (start._1 +: start._1.neighbors).map(n => n -> '#').toMap
-    (grid ++ newStarts ++ newWalls, newStarts.keys.toSeq)
+    (grid ++ entrances ++ newWalls, entrances.keys.toSeq)
   }
 
-  case class KeyFoundEvent(dist: Int, point: Point, key: Char)
-  def search(grid: Map[Point, Char], start: Point, keys: Set[Char]): List[KeyFoundEvent] = {
-    case class State(p: Point)
+  def nextKeys(grid: Map[Point, Char], start: Point, keys: Set[Char]): List[Key] = {
 
     @tailrec
-    def bfs(queue: Queue[(State, Int)],
-            seen: Set[State],
-            events: List[KeyFoundEvent]): List[KeyFoundEvent] = {
-      if (queue.isEmpty) events
-      else {
-        val ((state, dist), q) = queue.dequeue
-        if (seen.contains(state)) bfs(q, seen, events)
-        else if (grid(state.p) == '#') bfs(q, seen + state, events)
-        else
-          grid(state.p) match {
-            case c if c.isUpper && !keys.contains(c.toLower) =>
-              bfs(q, seen + state, events) // door, no key
-            case c =>
-              c match {
-                case k if k.isLetter && k.isLower && !keys.contains(k) => // found a new key
-                  bfs(q, seen, events :+ KeyFoundEvent(dist, state.p, k))
-                case _ =>
-                  val states = state.p.neighbors.map(n => (State(n), dist + 1))
-                  bfs(q ++ states, seen + state, events)
-              }
-          }
+    def bfs(queue: Queue[(Point, Int)], seen: Set[Point], acc: List[Key]): List[Key] =
+      queue match {
+        case q if q.isEmpty => acc
+        case _ =>
+          val ((point, dist), q) = queue.dequeue
+          if (seen.contains(point)) bfs(q, seen, acc)
+          else
+            grid(point) match {
+              case c if c == '#' || (c.isUpper && !keys.contains(c.toLower)) =>
+                bfs(q, seen + point, acc)
+              case c if c.isLower && !keys.contains(c) =>
+                bfs(q, seen, acc :+ Key(dist, point, c))
+              case _ =>
+                val states = point.neighbors.map(n => (n, dist + 1))
+                bfs(q ++ states, seen + point, acc)
+            }
       }
-    }
 
-    bfs(Queue((State(start), 0)), Set.empty, Nil)
-
+    bfs(Queue((start, 0)), Set.empty, Nil)
   }
 
-  def searchVaults(grid: Map[Point, Char], entrances: Seq[Point], keys: Set[Char]): Int = {
-    case class GlobalState(dist: Int, vaults: Seq[Point], keys: Set[Char])
+  def search(grid: Map[Point, Char], entrances: Seq[Point], keyCount: Int): Int = {
+    type VaultState = Set[(Point, Set[Char])]
+    case class State(dist: Int, vaults: Seq[Point], keys: Set[Char])
 
-    val seen: mutable.Map[Int, Set[(Point, Set[Char])]] =
+    val seen: mutable.Map[Int, VaultState] =
       mutable.Map(0 -> Set(), 1 -> Set(), 2 -> Set(), 3 -> Set())
+    val pq = mutable.PriorityQueue[State](State(0, entrances, Set()))(Ordering.by(-_.dist))
 
-    val pq = mutable.PriorityQueue[GlobalState]()(Ordering.by((gs: GlobalState) => -gs.dist))
-    pq.enqueue(GlobalState(0, entrances, Set.empty))
-
-    def step(): Option[Int] = {
-      val gs = pq.dequeue()
-      gs.keys match {
-        case gk if gk.size == keys.size => Some(gs.dist)
-        case _ =>
-          gs.vaults.zipWithIndex.foreach({
-            case (point, i) =>
-              if (!seen(i).contains((point, gs.keys))) {
-                seen(i) = seen(i) + ((point, gs.keys))
-                val events = search(grid, point, gs.keys)
-                events.foreach(e => {
-                  pq.enqueue(
-                    GlobalState(gs.dist + e.dist, gs.vaults.updated(i, e.point), gs.keys + e.key))
-                })
-              }
-          })
-          None
-      }
+    def step(): Option[Int] = pq.dequeue match {
+      case State(dist, _, keys) if keys.size == keyCount => Some(dist)
+      case State(dist, vaults, keys) =>
+        vaults.zipWithIndex.foreach({
+          case (point, i) =>
+            if (!seen(i).contains((point, keys))) {
+              seen(i) += ((point, keys))
+              pq ++= nextKeys(grid, point, keys).map(k =>
+                State(dist + k.dist, vaults.updated(i, k.point), keys + k.key))
+            }
+        })
+        None
     }
 
-    Iterator.continually(step()).dropWhile(_.isEmpty).next.get
+    Iterator.continually(step()).flatten.next
   }
 
   override def run(): Any = {
-    val input          = Source.fromResource("day18.txt").mkString.toList
-    val (grid, starts) = getGrid(input)
-    val allKeys        = grid.filter(_._2.isLower).values.toSet
-    searchVaults(grid, starts, allKeys)
+    val input             = Source.fromResource("day18.txt").mkString.toList
+    val (grid, entrances) = getGrid(input)
+    val keyCount          = grid.count(_._2.isLower)
+    search(grid, entrances, keyCount)
   }
 
 }

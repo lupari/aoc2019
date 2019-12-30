@@ -13,7 +13,7 @@ object Day25 extends Challenge {
     def acc(in: ic.Input, moves: List[String], out: List[Int], res: Int): Int = {
       val output = ic.execute(in)
       output match {
-        case ic.Output(sig, ic.KILL, _, _) =>
+        case ic.Output(_, ic.KILL, _, _) => // game over
           val pwd = out.map(_.toChar).dropWhile(!_.isDigit).takeWhile(_.isDigit)
           pwd.mkString.toInt
         case ic.Output(Nil, ptr, rb, state) =>
