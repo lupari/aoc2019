@@ -25,7 +25,7 @@ object Day6b extends Challenge {
       Source.fromResource("day6.txt").getLines.map(parse).map(o => o.item -> o).toMap
     val p1 = pathToCom(orbits("YOU"), orbits, Nil)
     val p2 = pathToCom(orbits("SAN"), orbits, Nil)
-    (p1 ++ p2).groupBy(identity).mapValues(_.size).count(_._2 == 1) - 2
+    (p1 ++ p2).groupBy(identity).view.mapValues(_.size).count(_._2 == 1) - 2
   }
 
 }

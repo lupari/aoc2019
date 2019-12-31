@@ -15,7 +15,7 @@ object Day10 extends Challenge {
 
       xs.map(p => {
           val (dx, dy) = (p.x - x, p.y - y)
-          val g        = math.abs(gcd(dx, dy))
+          val g        = gcd(dx, dy).abs
           Point(dx / g, dy / g)
         })
         .toSet

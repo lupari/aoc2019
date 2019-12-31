@@ -13,13 +13,13 @@ object Day12b extends Challenge {
     def sum: Int             = x.abs + y.abs + z.abs
   }
   case class Moon(pos: ThreeD, velocity: ThreeD) {
-    def potential = pos.sum
-    def kinetic   = velocity.sum
-    def total     = potential * kinetic
+    def potential: Int = pos.sum
+    def kinetic: Int   = velocity.sum
+    def total: Int     = potential * kinetic
   }
 
   def gravity(p: ThreeD, points: List[ThreeD]): ThreeD = {
-    def cmp(a: Int, b: Int) = a match {
+    def cmp(a: Int, b: Int): Int = a match {
       case x if x < b  => 1
       case x if x == b => 0
       case x if x > b  => -1
@@ -47,7 +47,8 @@ object Day12b extends Challenge {
 
   def cycleLength[A, B](xs: List[A])(f: List[A] => List[A])(g: A => B): Int = {
     val memo: mutable.Map[List[B], List[B]] = mutable.Map()
-    Iterator.iterate((xs, Nil))(p => (f(p._1), p._2))
+    Iterator
+      .iterate((xs, Nil))(p => (f(p._1), p._2))
       .zipWithIndex
       .map(x => (x._2, memo.put(x._1._1.map(g), x._1._2.map(g))))
       .dropWhile(x => x._2.isEmpty)

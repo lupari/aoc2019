@@ -48,7 +48,6 @@ object Day19b extends Challenge {
       .dropWhile(_._3 == -1)
       .next
     x * 10000 + y - 99
-
   }
 
 }

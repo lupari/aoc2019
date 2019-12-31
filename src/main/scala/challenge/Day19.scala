@@ -14,7 +14,7 @@ object Day19 extends Challenge {
 
   override def run(): Any = {
     val program = ic.read(Source.fromResource("day19.txt"))
-    val input   = for { y <- (0 until 50); x <- (0 until 50) } yield (x, y)
+    val input   = for { y <- 0 until 50; x <- 0 until 50 } yield (x, y)
     beamSize(program, input)
   }
 

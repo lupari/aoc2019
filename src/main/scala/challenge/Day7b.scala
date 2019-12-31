@@ -12,7 +12,7 @@ object Day7b extends Challenge {
   def amplify(amp: Amp): ic.Output =
     ic.execute(ic.Input(amp.program, amp.in, Some(ic.Resume(amp.pointer, rb = 0))))
 
-  def feedbackLoop(amps: List[Amp]) = {
+  def feedbackLoop(amps: List[Amp]): Int = {
 
     @tailrec
     def acc(xs: List[Amp], i: Int, signals: List[Int]): Int = amplify(xs(i)) match {
@@ -31,9 +31,7 @@ object Day7b extends Challenge {
   override def run(): Any = {
     val program = ic.read(Source.fromResource("day7.txt"))
     (5 to 9).toList.permutations.zipWithIndex
-      .map(
-        p => p._1.map(i => Amp(if (p._2 == 0) List(i, 0) else List(i), program))
-      )
+      .map(p => p._1.map(i => Amp(if (p._2 == 0) List(i, 0) else List(i), program)))
       .map(feedbackLoop)
       .max
   }

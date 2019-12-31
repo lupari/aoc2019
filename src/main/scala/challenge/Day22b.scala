@@ -17,32 +17,39 @@ object Day22b extends Challenge {
   }
 
   // helpers for preventing integer overflows
-  def **(a: Long, b: Long): BigInt                  = BigInt(a) * BigInt(b)
-  def %%(a: BigInt, m: Long): Long                  = a.mod(m).toLong
-  def **%(a: Long, b: Long, m: Long): Long          = %%(**(a, b), m)
+  def **(a: Long, b: Long): BigInt = BigInt(a) * BigInt(b)
+  // a mod m
+  def %%(a: BigInt, m: Long): Long = a.mod(m).toLong
+  // a*b mod m
+  def **%(a: Long, b: Long, m: Long): Long = %%(**(a, b), m)
+  // a * b + c mod m
   def *+%(a: Long, b: Long, c: Long, m: Long): Long = ((**(a, b) + c) % m).toLong
 
-  def inverse(instr: Instruction, a: Long, b: Long, m: Long): (Long, Long) = instr match {
-    case Instruction(0, None)    => ((-a) % m, (-b - 1) % m)
-    case Instruction(1, Some(n)) => (**%(a, n, m), **%(b, n, m))
-    case Instruction(2, Some(n)) => (a, (b - n) % m)
-    case _                       => throw new NoSuchElementException
+  def bf(instr: Instruction, a: Long, b: Long, m: Long): (Long, Long) = instr match {
+    case Instruction(0, None) => // x -> -x-1; ax + b -> -ax - b - 1; -a mod m, -b - 1 mod m
+      (-a % m, -b - 1 % m)
+    case Instruction(1, Some(i)) => // x -> x*i; ax + b -> aix + bi; ai mod m, bi mod m
+      (**%(a, i, m), **%(b, i, m))
+    case Instruction(2, Some(i)) => // x -> x-1; ax + b -> ax + b - 1; a mod m, b - 1 mod m
+      (a % m, b - i % m)
+    case _ => throw new NoSuchElementException
   }
 
   def shuffle(xs: List[Instruction], pos: Int, n: Long, k: Long): Long = {
 
     def exp(a: Long, b: Long, c: Long, d: Long, e: Long): (Long, Long, Long, Long, Long) = {
-      val e2 = e >> 1
       val b2 = *+%(a, b, b, n)
       val a2 = **%(a, a, n)
-      val c2 = if ((e & 1) == 1) **%(a, c, n) else c
-      val d2 = if ((e & 1) == 1) *+%(a, d, b, n) else d
-      (a2, b2, c2, d2, e2)
+      val c2 = if (e % 2 == 1) **%(a, c, n) else c
+      val d2 = if (e % 2 == 1) *+%(a, d, b, n) else d
+      (a2, b2, c2, d2, e / 2)
     }
 
-    val (a, b)       = xs.foldLeft(1L, 0L)((acc, instr) => inverse(instr, acc._1, acc._2, n))
+    // basis function f(x) = ax + b
+    val (a, b) = xs.foldLeft((1L, 0L))((acc, instr) => bf(instr, acc._1, acc._2, n))
+    // inverted basis function f-1(x) = (a^-1)(x-b)
     val modInvA      = BigInt(a).modInverse(n).toLong
-    val (invA, invB) = (modInvA, **%(-b, modInvA, n))
+    val (invA, invB) = (modInvA, **%(modInvA, -b, n))
 
     val res = Iterator
       .iterate((invA, invB, 1L, 0L, k))(p => exp(p._1, p._2, p._3, p._4, p._5))

@@ -12,11 +12,7 @@ object Day7 extends Challenge {
 
   override def run(): Any = {
     val program = ic.read(Source.fromResource("day7.txt"))
-    (0 to 4).permutations
-      .map(
-        seq => seq.foldLeft(0)((acc, i) => execute(program, List(i, acc)).head)
-      )
-      .max
+    (0 to 4).permutations.map(_.foldLeft(0)((acc, i) => execute(program, List(i, acc)).head)).max
   }
 
 }

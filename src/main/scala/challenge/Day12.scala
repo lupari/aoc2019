@@ -12,13 +12,13 @@ object Day12 extends Challenge {
     def sum: Int             = x.abs + y.abs + z.abs
   }
   case class Moon(pos: ThreeD, velocity: ThreeD) {
-    def potential = pos.sum
-    def kinetic   = velocity.sum
-    def total     = potential * kinetic
+    def potential: Int = pos.sum
+    def kinetic: Int   = velocity.sum
+    def total: Int     = potential * kinetic
   }
 
-  def gravity(p: ThreeD, points: List[ThreeD]) = {
-    def cmp(a: Int, b: Int) = a match {
+  def gravity(p: ThreeD, points: List[ThreeD]): ThreeD = {
+    def cmp(a: Int, b: Int): Int = a match {
       case x if x < b  => 1
       case x if x == b => 0
       case x if x > b  => -1

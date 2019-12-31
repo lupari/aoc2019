@@ -10,14 +10,14 @@ object Day10b extends Challenge {
 
   case class Point(x: Int, y: Int) extends Ordered[Point] {
     override def compare(p: Point): Int = (x, y).compareTo((p.x, p.y))
-    def +(p: Point)                     = Point(x + p.x, y + p.y)
+    def +(p: Point): Point              = Point(x + p.x, y + p.y)
     def visibleFrom(xs: List[Point]): Set[Point] = {
       @tailrec
       def gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
 
       xs.map(p => {
           val (dx, dy) = (p.x - x, p.y - y)
-          val d        = math.abs(gcd(dx, dy))
+          val d        = gcd(dx, dy).abs
           Point(dx / d, dy / d)
         })
         .toSet
