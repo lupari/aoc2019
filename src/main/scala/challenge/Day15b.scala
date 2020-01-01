@@ -9,7 +9,7 @@ import scala.util.Random
 object Day15b extends Challenge {
 
   case class Square(x: Int, y: Int) {
-    def neighbors(): List[(Square, Int)] = List(
+    def neighbors: List[(Square, Int)] = List(
       (Square(x, y + 1), 1),
       (Square(x, y - 1), 2),
       (Square(x + 1, y), 4),
@@ -64,7 +64,7 @@ object Day15b extends Challenge {
     def acc(xs: Map[Square, Int], t: Int): Int = {
       val oxygenated = xs.filter(_._2 == 4)
       val neighbors: Set[Square] = oxygenated
-        .flatMap(_._1.neighbors())
+        .flatMap(_._1.neighbors)
         .keys
         .filter(k => xs.contains(k) && xs(k) == 1)
         .toSet

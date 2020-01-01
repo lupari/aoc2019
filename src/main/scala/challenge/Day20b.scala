@@ -1,6 +1,7 @@
 package challenge
 
 import base.Challenge
+import lib.Grids.{Grid, GridInput, Point}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -8,30 +9,7 @@ import scala.io.Source
 
 object Day20b extends Challenge {
 
-  case class Point(x: Int, y: Int) {
-    def neighbors = List(Point(x, y + 1), Point(x, y - 1), Point(x + 1, y), Point(x - 1, y))
-  }
-  type Grid = Map[Point, Char]
-
-  def getGrid(input: List[Char]): Grid = {
-
-    @tailrec
-    def acc(xs: List[Char], grid: Grid, current: Point): Grid =
-      xs match {
-        case h :: t =>
-          h.toChar match {
-            case '\n' =>
-              acc(t, grid, Point(0, current.y + 1))
-            case c =>
-              acc(t, grid.updated(current, c), Point(current.x + 1, current.y))
-          }
-        case _ => grid
-      }
-
-    acc(input, Map.empty, Point(0, 0))
-  }
-
-  def teleport(src: Point)(implicit grid: Grid): Option[(Point, String)] = {
+  def teleport(src: Point)(implicit grid: Grid[Char]): Option[(Point, String)] = {
     val srcId = grid(src)
     val dstId = grid(src.neighbors.find(grid(_).isLetter).get)
     val dst = grid
@@ -63,7 +41,7 @@ object Day20b extends Challenge {
     case _ => label != "ZZ" && label != "AA"
   }
 
-  def nextMoves(s: Point, level: Int)(implicit grid: Grid): List[(Point, Int)] = {
+  def nextMoves(s: Point, level: Int)(implicit grid: Grid[Char]): List[(Point, Int)] = {
     val open = s.neighbors.filter(grid(_) == '.').map((_, 0))
     s.neighbors.find(grid(_).isLetter) match {
       case Some(port) =>
@@ -77,7 +55,7 @@ object Day20b extends Challenge {
     }
   }
 
-  def pathLength(start: Point, goal: Point, maxDepth: Int = 50)(implicit grid: Grid): Int = {
+  def pathLength(start: Point, goal: Point, maxDepth: Int = 50)(implicit grid: Grid[Char]): Int = {
     case class State(s: Point, level: Int)
 
     @tailrec
@@ -101,7 +79,7 @@ object Day20b extends Challenge {
     bfs(Queue((State(start, 0), 0)), Set.empty)
   }
 
-  def findEndpoint(label: Char)(implicit grid: Grid): Point =
+  def findEndpoint(label: Char)(implicit grid: Grid[Char]): Point =
     grid
       .filter(_._2 == label)
       .keys
@@ -111,8 +89,8 @@ object Day20b extends Challenge {
       .head
 
   override def run(): Any = {
-    val input               = Source.fromResource("day20.txt").mkString.toList
-    implicit val grid: Grid = getGrid(input).withDefaultValue('#')
+    val input                     = Source.fromResource("day20.txt").mkString.toList
+    implicit val grid: Grid[Char] = GridInput(input).withDefaultValue('#')
 
     val start = findEndpoint('A')
     val goal  = findEndpoint('Z')

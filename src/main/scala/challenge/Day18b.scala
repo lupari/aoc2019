@@ -1,6 +1,7 @@
 package challenge
 
 import base.Challenge
+import lib.Grids.{Grid, GridInput, Point}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -9,35 +10,9 @@ import scala.io.Source
 
 object Day18b extends Challenge {
 
-  case class Point(x: Int, y: Int) {
-    def neighbors = List(Point(x, y - 1), Point(x + 1, y), Point(x, y + 1), Point(x - 1, y))
-    def corners =
-      List(Point(x - 1, y - 1), Point(x + 1, y - 1), Point(x - 1, y + 1), Point(x + 1, y + 1))
-  }
   case class Key(dist: Int, point: Point, key: Char)
 
-  def getGrid(input: List[Char]): (Map[Point, Char], Seq[Point]) = {
-
-    @tailrec
-    def acc(xs: List[Char], grid: Map[Point, Char], current: Point): Map[Point, Char] = xs match {
-      case h :: t =>
-        h.toChar match {
-          case '\n' =>
-            acc(t, grid, Point(0, current.y + 1))
-          case c =>
-            acc(t, grid.updated(current, c), Point(current.x + 1, current.y))
-        }
-      case _ => grid
-    }
-
-    val grid      = acc(input, Map.empty.withDefaultValue(' '), Point(0, 0))
-    val start     = grid.find(_._2 == '@').get
-    val entrances = start._1.corners.map(c => c -> '@').toMap
-    val newWalls  = (start._1 +: start._1.neighbors).map(n => n -> '#').toMap
-    (grid ++ entrances ++ newWalls, entrances.keys.toSeq)
-  }
-
-  def nextKeys(grid: Map[Point, Char], start: Point, keys: Set[Char]): List[Key] = {
+  def nextKeys(grid: Grid[Char], start: Point, keys: Set[Char]): List[Key] = {
 
     @tailrec
     def bfs(queue: Queue[(Point, Int)], seen: Set[Point], acc: List[Key]): List[Key] =
@@ -61,7 +36,7 @@ object Day18b extends Challenge {
     bfs(Queue((start, 0)), Set.empty, Nil)
   }
 
-  def search(grid: Map[Point, Char], entrances: Seq[Point], keyCount: Int): Int = {
+  def search(grid: Grid[Char], entrances: Seq[Point], keyCount: Int): Int = {
     type VaultState = Set[(Point, Set[Char])]
     case class State(dist: Int, vaults: Seq[Point], keys: Set[Char])
 
@@ -88,8 +63,12 @@ object Day18b extends Challenge {
 
   override def run(): Any = {
     val input             = Source.fromResource("day18.txt").mkString.toList
-    val (grid, entrances) = getGrid(input)
-    val keyCount          = grid.count(_._2.isLower)
+    val grid0             = GridInput(input).withDefaultValue(' ')
+    val keyCount          = grid0.count(_._2.isLower)
+    val start             = grid0.find(_._2 == '@').get
+    val corners           = start._1.corners.map(c => c -> '@').toMap
+    val newWalls          = (start._1 +: start._1.neighbors).map(n => n -> '#').toMap
+    val (grid, entrances) = (grid0 ++ corners ++ newWalls, corners.keys.toSeq)
     search(grid, entrances, keyCount)
   }
 

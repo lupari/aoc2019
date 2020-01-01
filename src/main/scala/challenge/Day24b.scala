@@ -1,18 +1,12 @@
 package challenge
 
 import base.Challenge
+import lib.Grids.Point
 
 import scala.io.Source
 
 object Day24b extends Challenge {
 
-  case class Point(x: Int, y: Int) {
-    def +(p: Point): Point = Point(x + p.x, y + p.y)
-  }
-  object Point {
-    def adj: List[Point] = List(Point(1, 0), Point(-1, 0), Point(0, 1), Point(0, -1))
-  }
-  val center = Point(2, 2)
   type PointAtLevel = (Int, Point)
   type Grid         = List[List[Char]]
   type Grids        = Map[Int, Grid]
@@ -68,7 +62,6 @@ object Day24b extends Challenge {
                 })
             }))
         })
-        .toMap
     }
     val afterMinutes = Iterator.iterate(Map(0 -> grid))(transform).drop(minutes).next
     afterMinutes.values.flatten.flatten.count(_ == '#')

@@ -1,36 +1,15 @@
 package challenge
 
 import base.Challenge
+import lib.Grids.{Grid, GridInput, Point}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
-
 import scala.io.Source
 
 object Day18 extends Challenge {
 
-  case class Point(x: Int, y: Int) {
-    def neighbors = List(Point(x, y - 1), Point(x + 1, y), Point(x, y + 1), Point(x - 1, y))
-  }
-
-  def getGrid(input: List[Char]): Map[Point, Char] = {
-
-    @tailrec
-    def acc(xs: List[Char], grid: Map[Point, Char], current: Point): Map[Point, Char] = xs match {
-      case h :: t =>
-        h.toChar match {
-          case '\n' =>
-            acc(t, grid, Point(0, current.y + 1))
-          case c =>
-            acc(t, grid.updated(current, c), Point(current.x + 1, current.y))
-        }
-      case _ => grid
-    }
-
-    acc(input, Map.empty.withDefaultValue(' '), Point(0, 0))
-  }
-
-  def search(grid: Map[Point, Char]): Int = {
+  def search(grid: Grid[Char]): Int = {
     case class State(p: Point, keys: Set[Char])
     val start    = grid.find(_._2 == '@').get
     val keyCount = grid.values.count(_.isLower)
@@ -61,8 +40,9 @@ object Day18 extends Challenge {
   }
 
   override def run(): Any = {
-    val input = Source.fromResource("day18.txt").mkString.toList
-    val grid  = getGrid(input)
+    val input            = Source.fromResource("day18.txt").mkString.toList
+    val grid: Grid[Char] = GridInput(input).withDefaultValue(' ')
+
     search(grid)
   }
 
