@@ -17,11 +17,11 @@ object Day3b extends Challenge {
     }
 
     @tailrec
-    def acc(p: (Int, Int), xs: List[String], coords: Seq[(Int, Int)]): Seq[(Int, Int)] = xs match {
+    def acc(p: (Int, Int), xs: List[String], points: Seq[(Int, Int)]): Seq[(Int, Int)] = xs match {
       case h :: t =>
         val path = project(h.head, h.drop(1).toInt, p)
-        acc(path.last, t, coords ++ path)
-      case _ => coords
+        acc(path.last, t, points ++ path)
+      case _ => points
     }
 
     Seq((0, 0)) ++ acc((0, 0), wire, Nil)

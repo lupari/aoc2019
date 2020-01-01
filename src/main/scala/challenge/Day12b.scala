@@ -2,6 +2,7 @@ package challenge
 
 import base.Challenge
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.io.Source
 import scala.util.matching.Regex
@@ -62,6 +63,7 @@ object Day12b extends Challenge {
     val cly = f(m => (m.pos.y, m.velocity.y))
     val clz = f(m => (m.pos.z, m.velocity.z))
 
+    @tailrec
     def gcd(a: Long, b: Long): Long = if (b == 0) a else gcd(b, a % b)
     def lcm(a: Long, b: Long): Long = a * b / gcd(a, b)
 

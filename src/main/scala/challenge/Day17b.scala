@@ -1,7 +1,7 @@
 package challenge
 
 import base.{Challenge, IntCode => ic}
-import lib.Grids.{Dir, Grid, GridInput, Point}
+import lib.Grids.{Dir, Grid, GridInput}
 
 import scala.annotation.tailrec
 import scala.io.Source

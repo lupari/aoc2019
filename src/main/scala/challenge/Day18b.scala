@@ -28,7 +28,7 @@ object Day18b extends Challenge {
               case c if c.isLower && !keys.contains(c) =>
                 bfs(q, seen, acc :+ Key(dist, point, c))
               case _ =>
-                val states = point.neighbors.map(n => (n, dist + 1))
+                val states = point.neighbors.map((_, dist + 1))
                 bfs(q ++ states, seen + point, acc)
             }
       }

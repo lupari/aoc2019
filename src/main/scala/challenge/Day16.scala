@@ -15,7 +15,6 @@ object Day16 extends Challenge {
         val p = pattern(base, i)
         xs.zipWithIndex.map(x => x._1 * p((x._2 + 1) % p.length)).sum.abs % 10
       })
-      .toIndexedSeq
 
   override def run(): Any = {
     val input: IndexedSeq[Int] =

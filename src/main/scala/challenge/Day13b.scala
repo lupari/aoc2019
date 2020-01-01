@@ -17,18 +17,18 @@ object Day13b extends Challenge {
       val input  = ic.Input(output.state, Nil, Some(ic.Resume(output.p, output.rb)))
       output match {
         case ic.Output(_, ic.KILL, _, _) => game.score // game over
-        case ic.Output(Nil, ptr, rb, state) => // input wanted
+        case ic.Output(Nil, _, _, _) => // input wanted
           val move = game.ball.compare(game.paddle)
           acc(input.copy(in = List(move)), Nil, game)
-        case ic.Output(sig, ptr, rb, state) =>
+        case ic.Output(sig, _, _, _) =>
           out match {
-            case h :: i :: _ if (h == -1 && i == 0) => // score
+            case h :: i :: _ if h == -1 && i == 0 => // score
               acc(input, Nil, game.copy(score = sig.head.toInt))
-            case h :: i :: _ => // tile type received
+            case h :: _ :: _ => // tile type received
               val ball   = if (sig.head == 4) h else game.ball
               val paddle = if (sig.head == 3) h else game.paddle
               acc(input, Nil, game.copy(ball = ball, paddle = paddle))
-            case _ => // coords received
+            case _ => // coordinates received
               acc(input, out :+ sig.head.toInt, game)
           }
       }
