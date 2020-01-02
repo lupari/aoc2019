@@ -1,6 +1,7 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
+import base.Challenge
+import intcode.{IntCode => ic}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -24,7 +25,7 @@ object Day23 extends Challenge {
             val (in, q) =
               if (computer.q.isEmpty) (List(-1L), Queue.empty)
               else (computer.q.head.coords, computer.q.tail)
-            val state = ic.Input(output.state, in, Some(ic.Resume(output.p, output.rb)))
+            val state = ic.Input(output.state, in, Some(ic.State(output.p, output.rb)))
             val c2    = computer.copy(state = state, q = q)
             output.sig match {
               case h :: _ =>
@@ -53,8 +54,8 @@ object Day23 extends Challenge {
     }
 
     val booted = (0 until 50)
-      .map(i => ic.execute(ic.Input(program, List(i), Some(ic.Resume(0, 0)))))
-      .map(o => Computer(ic.Input(o.state, Nil, Some(ic.Resume(o.p, o.rb))), Nil, Queue.empty))
+      .map(i => ic.execute(ic.Input(program, List(i), Some(ic.State(0, 0)))))
+      .map(o => Computer(ic.Input(o.state, Nil, Some(ic.State(o.p, o.rb))), Nil, Queue.empty))
 
     execute(booted)
   }

@@ -1,6 +1,7 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
+import base.Challenge
+import intcode.{IntCode => ic}
 
 import scala.annotation.tailrec
 import scala.io.Source
@@ -21,12 +22,12 @@ object Day25 extends Challenge {
           // println((out.map(_.toChar)).mkString)
           // val input = StdIn.readLine().trim.toList :+ '\n'
           val input = moves.head.toList :+ '\n'
-          acc(ic.Input(state, input.map(_.toInt), Some(ic.Resume(ptr, rb))), moves.tail, Nil, res)
+          acc(ic.Input(state, input.map(_.toInt), Some(ic.State(ptr, rb))), moves.tail, Nil, res)
         case ic.Output(sig, ptr, rb, state) =>
-          acc(ic.Input(state, Nil, Some(ic.Resume(ptr, rb))), moves, out ++ sig.map(_.toInt), res)
+          acc(ic.Input(state, Nil, Some(ic.State(ptr, rb))), moves, out ++ sig.map(_.toInt), res)
       }
     }
-    acc(ic.Input(program, Nil, Some(ic.Resume(0, 0))), walkthrough, Nil, 0)
+    acc(ic.Input(program, Nil, Some(ic.State(0, 0))), walkthrough, Nil, 0)
   }
 
   override def run(): Any = {

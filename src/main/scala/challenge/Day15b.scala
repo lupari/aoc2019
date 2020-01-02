@@ -1,6 +1,7 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
+import base.Challenge
+import intcode.{IntCode => ic}
 
 import scala.annotation.tailrec
 import scala.io.Source
@@ -44,18 +45,18 @@ object Day15b extends Challenge {
             sig.head.toInt match {
               case 0 => // next would hit wall
                 val dir   = nextMove(newGrid, curr)
-                val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
+                val input = ic.Input(state, List(dir), Some(ic.State(ptr, rb)))
                 acc(input, curr, newGrid, t + 1, goalFound)
               case _ => // next would be ok
                 val dir   = nextMove(newGrid, nextSquare)
-                val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
+                val input = ic.Input(state, List(dir), Some(ic.State(ptr, rb)))
                 acc(input, nextSquare, newGrid, t + 1, if (sig.head.toInt == 2) true else goalFound)
             }
         }
       }
     }
 
-    acc(ic.Input(program, List(1), Some(ic.Resume(0, 0))), Square(0, 0), Map(Square(0, 0) -> 0), 0)
+    acc(ic.Input(program, List(1), Some(ic.State(0, 0))), Square(0, 0), Map(Square(0, 0) -> 0), 0)
   }
 
   def oxygenationTime(maze: Map[Square, Int]): Int = {

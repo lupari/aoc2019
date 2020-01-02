@@ -1,6 +1,7 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
+import base.Challenge
+import intcode.{IntCode => ic}
 
 import scala.io.Source
 

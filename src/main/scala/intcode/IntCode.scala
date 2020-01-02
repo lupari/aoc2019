@@ -1,13 +1,13 @@
-package base
+package intcode
 
-import scala.io.Source
 import scala.annotation.tailrec
+import scala.io.Source
 
 object IntCode {
 
   type Program = Map[Long, Long]
-  case class Resume(pointer: Long, rb: Long)
-  case class Input(program: Program, in: List[Long], resume: Option[Resume] = None)
+  case class State(pointer: Long, rb: Long)
+  case class Input(program: Program, in: List[Long], haltOnOutput: Option[State] = None)
   case class Output(sig: List[Long], p: Long, rb: Long, state: Program)
   val KILL: Long = -1
 
@@ -55,8 +55,8 @@ object IntCode {
                 case _ => Output(out, p, rb, xs) // halt as no input available
               }
             case 4 => // write
-              input.resume match {
-                case Some(_) => Output(List(v1), p + 2, rb, xs)
+              input.haltOnOutput match {
+                case Some(_) => Output(List(v1), p + 2, rb, xs) // halt as asked to
                 case None    => acc(p + 2, xs, in, rb, out :+ v1)
               }
             case 5 => // jmp-true
@@ -72,8 +72,8 @@ object IntCode {
           }
       }
 
-    val pointer: Long = input.resume.map(_.pointer).getOrElse(0)
-    val rb: Long      = input.resume.map(_.rb).getOrElse(0)
+    val pointer: Long = input.haltOnOutput.map(_.pointer).getOrElse(0)
+    val rb: Long      = input.haltOnOutput.map(_.rb).getOrElse(0)
     acc(pointer, input.program, input.in, rb, Nil)
   }
 

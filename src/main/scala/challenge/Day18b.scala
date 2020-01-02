@@ -1,7 +1,8 @@
 package challenge
 
 import base.Challenge
-import lib.Grids.{Grid, GridInput, Point}
+import lib.GridImplicits._
+import lib.Points.Point
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -62,8 +63,7 @@ object Day18b extends Challenge {
   }
 
   override def run(): Any = {
-    val input             = Source.fromResource("day18.txt").mkString.toList
-    val grid0             = GridInput(input).withDefaultValue(' ')
+    val grid0             = Source.fromResource("day18.txt").mkString.toList.toGrid
     val keyCount          = grid0.count(_._2.isLower)
     val start             = grid0.find(_._2 == '@').get
     val corners           = start._1.corners.map(c => c -> '@').toMap

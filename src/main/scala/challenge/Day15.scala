@@ -1,6 +1,7 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
+import base.Challenge
+import intcode.{IntCode => ic}
 import lib.Graphs.AStar
 
 import scala.annotation.tailrec
@@ -39,11 +40,11 @@ object Day15 extends Challenge {
           sig.head.toInt match {
             case 0 => // next would hit wall
               val dir   = nextMove(newGrid, curr)
-              val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
+              val input = ic.Input(state, List(dir), Some(ic.State(ptr, rb)))
               acc(input, curr, newGrid)
             case 1 => // next would be ok
               val dir   = nextMove(newGrid, nextSquare)
-              val input = ic.Input(state, List(dir), Some(ic.Resume(ptr, rb)))
+              val input = ic.Input(state, List(dir), Some(ic.State(ptr, rb)))
               acc(input, nextSquare, newGrid)
             case 2 => // next would reach goal
               grid.updated(nextSquare, 2)
@@ -51,7 +52,7 @@ object Day15 extends Challenge {
       }
     }
 
-    acc(ic.Input(program, List(1), Some(ic.Resume(0, 0))), Square(0, 0), Map(Square(0, 0) -> 0))
+    acc(ic.Input(program, List(1), Some(ic.State(0, 0))), Square(0, 0), Map(Square(0, 0) -> 0))
   }
 
   override def run(): Any = {

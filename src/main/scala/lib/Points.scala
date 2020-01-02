@@ -1,9 +1,6 @@
 package lib
 
-import scala.annotation.tailrec
-import scala.reflect.ClassTag
-
-object Grids {
+object Points {
 
   case class Point(x: Int, y: Int) {
     def +(p: Point): Point = Point(x + p.x, y + p.y)
@@ -28,32 +25,6 @@ object Grids {
       case 'L' => if (clockwise) Dir(Point(p.x, p.y - 1), 'U') else Dir(Point(p.x, p.y + 1), 'D')
       case 'R' => if (clockwise) Dir(Point(p.x, p.y + 1), 'D') else Dir(Point(p.x, p.y - 1), 'U')
     }
-  }
-
-  type Grid[A] = Map[Point, A]
-
-  object GridInput {
-    def apply(input: List[Char]): Grid[Char] = {
-      @tailrec
-      def acc(xs: List[Char], grid: Grid[Char], current: Point): Grid[Char] =
-        xs match {
-          case h :: t if h == '\n' => acc(t, grid, Point(0, current.y + 1))
-          case h :: t              => acc(t, grid.updated(current, h), Point(current.x + 1, current.y))
-          case _                   => grid
-        }
-      acc(input, Map.empty, Point(0, 0))
-    }
-  }
-
-  object GridCanvas {
-    def apply[A](grid: Grid[A], default: A)(cf: A => A)(
-        implicit classTag: ClassTag[A]): Array[Array[A]] = {
-      val (x, y) = (grid.keys.maxBy(_.x).x, grid.keys.maxBy(_.y).y)
-      val canvas = Array.tabulate(y + 1, x + 1)((_, _) => default)
-      for { p <- grid } yield canvas(p._1.y)(p._1.x) = cf(p._2)
-      canvas
-    }
-
   }
 
 }

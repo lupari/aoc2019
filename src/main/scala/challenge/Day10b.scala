@@ -1,7 +1,7 @@
 package challenge
 
 import base.Challenge
-import lib.Grids.Point
+import lib.Points.Point
 
 import scala.annotation.tailrec
 import scala.io.Source

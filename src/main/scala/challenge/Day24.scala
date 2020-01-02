@@ -1,7 +1,8 @@
 package challenge
 
 import base.Challenge
-import lib.Grids.{Grid, GridInput, Point}
+import lib.GridImplicits._
+import lib.Points.Point
 
 import scala.io.Source
 
@@ -47,7 +48,7 @@ object Day24 extends Challenge {
 
   override def run(): Any = {
     val input = Source.fromResource("day24.txt").mkString.toList
-    val grid  = GridInput(input).withDefaultValue('-')
+    val grid  = input.toGrid.withDefaultValue('-')
     calculate(grid)
   }
 }

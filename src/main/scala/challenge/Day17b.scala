@@ -1,7 +1,9 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
-import lib.Grids.{Dir, Grid, GridInput}
+import base.Challenge
+import intcode.{IntCode => ic}
+import lib.GridImplicits._
+import lib.Points._
 
 import scala.annotation.tailrec
 import scala.io.Source
@@ -112,7 +114,7 @@ object Day17b extends Challenge {
   override def run(): Any = {
     val program   = ic.read(Source.fromResource("day17.txt"))
     val output    = ic.execute(ic.Input(program, Nil)).sig.map(_.toInt)
-    val grid      = GridInput(output.map(_.toChar)).withDefaultValue('.')
+    val grid      = output.map(_.toChar).toGrid.withDefaultValue('.')
     val path      = compress(getPath(grid).mkString)
     val movements = findMovements(path)
     val seqM      = ascii1(mainRoutine(path, movements))

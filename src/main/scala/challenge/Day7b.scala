@@ -1,6 +1,7 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
+import base.Challenge
+import intcode.{IntCode => ic}
 
 import scala.annotation.tailrec
 import scala.io.Source
@@ -10,7 +11,7 @@ object Day7b extends Challenge {
   case class Amp(in: List[Long], program: ic.Program, pointer: Long = 0)
 
   def amplify(amp: Amp): ic.Output =
-    ic.execute(ic.Input(amp.program, amp.in, Some(ic.Resume(amp.pointer, rb = 0))))
+    ic.execute(ic.Input(amp.program, amp.in, Some(ic.State(amp.pointer, rb = 0))))
 
   def feedbackLoop(amps: List[Amp]): Int = {
 

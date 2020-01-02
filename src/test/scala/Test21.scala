@@ -1,4 +1,3 @@
-import base.{IntCode => ic}
 import challenge.{Day20b, Day21}
 import org.scalatest._
 

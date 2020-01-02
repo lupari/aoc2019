@@ -1,7 +1,8 @@
 package challenge
 
 import base.Challenge
-import lib.Grids.{Grid, GridInput, Point}
+import lib.GridImplicits._
+import lib.Points.Point
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -90,7 +91,7 @@ object Day20b extends Challenge {
 
   override def run(): Any = {
     val input                     = Source.fromResource("day20.txt").mkString.toList
-    implicit val grid: Grid[Char] = GridInput(input).withDefaultValue('#')
+    implicit val grid: Grid[Char] = input.toGrid.withDefaultValue('#')
 
     val start = findEndpoint('A')
     val goal  = findEndpoint('Z')

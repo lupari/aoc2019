@@ -1,6 +1,7 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
+import base.Challenge
+import intcode.{IntCode => ic}
 
 import scala.annotation.tailrec
 import scala.io.Source
@@ -14,7 +15,7 @@ object Day13b extends Challenge {
     @tailrec
     def acc(in: ic.Input, out: List[Int], game: Game): Int = {
       val output = ic.execute(in)
-      val input  = ic.Input(output.state, Nil, Some(ic.Resume(output.p, output.rb)))
+      val input  = ic.Input(output.state, Nil, Some(ic.State(output.p, output.rb)))
       output match {
         case ic.Output(_, ic.KILL, _, _) => game.score // game over
         case ic.Output(Nil, _, _, _) => // input wanted
@@ -33,7 +34,7 @@ object Day13b extends Challenge {
           }
       }
     }
-    acc(ic.Input(program, Nil, Some(ic.Resume(0, 0))), Nil, Game())
+    acc(ic.Input(program, Nil, Some(ic.State(0, 0))), Nil, Game())
   }
 
   override def run(): Any = {

@@ -1,7 +1,9 @@
 package challenge
 
-import base.{Challenge, IntCode => ic}
-import lib.Grids._
+import base.Challenge
+import intcode.{IntCode => ic}
+import lib.GridImplicits._
+import lib.Points._
 
 import scala.annotation.tailrec
 import scala.io.Source
@@ -20,17 +22,17 @@ object Day11 extends Challenge {
               val color     = if (h == 0) '.' else '#'
               val next      = dir.rotate(clockwise = sig.head == 1)
               val nextColor = if (grid(next.p) == '.') 0 else 1
-              val input     = ic.Input(state, List(nextColor), Some(ic.Resume(ptr, rb)))
+              val input     = ic.Input(state, List(nextColor), Some(ic.State(ptr, rb)))
               acc(grid.updated(dir.p, color), next, Nil, input)
             case _ =>
               val color = sig.head.toInt
-              val input = ic.Input(state, Nil, Some(ic.Resume(ptr, rb)))
+              val input = ic.Input(state, Nil, Some(ic.State(ptr, rb)))
               acc(grid, dir, List(color), input)
           }
       }
 
     val grid = Map(Point(0, 0) -> '.').withDefaultValue('.')
-    acc(grid, Dir(Point(0, 0), 'U'), Nil, ic.Input(program, List(0), Some(ic.Resume(0, 0))))
+    acc(grid, Dir(Point(0, 0), 'U'), Nil, ic.Input(program, List(0), Some(ic.State(0, 0))))
   }
 
   override def run(): Any = {
